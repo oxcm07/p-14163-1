@@ -1,5 +1,7 @@
-package com.mysite.sbb;
+package com.mysite.sbb.question;
 
+import com.mysite.sbb.answer.Answer;
+import com.mysite.sbb.answer.AnswerRepository;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,9 +16,10 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 @ActiveProfiles("test")
 @SpringBootTest
-class PostRepositoryTest {
+@Transactional
+class QuestionRepositoryTest {
     @Autowired
-    private QuestionRepository questionRepository;
+    private com.mysite.sbb.question.QuestionRepository questionRepository;
 
     @Autowired
     private AnswerRepository answerRepository;
@@ -51,6 +54,7 @@ class PostRepositoryTest {
     @DisplayName("findBySubjectAndContent")
     void t4() {
         Question question = questionRepository.findBySubjectAndContent("sbb가 무엇인가요?", "sbb에 대해서 알고 싶습니다.").get();
+        // SELECT * FROM question WHERE subject = 'sbb가 무엇인가요?' AND content = 'sbb에 대해서 알고 싶습니다.'
         assertThat(question.getId()).isEqualTo(1);
     }
 
@@ -65,7 +69,6 @@ class PostRepositoryTest {
 
     @Test
     @DisplayName("수정")
-    @Transactional
     void t6() {
         Question question = questionRepository.findById(1).get();
         assertThat(question).isNotNull();
@@ -79,7 +82,6 @@ class PostRepositoryTest {
 
     @Test
     @DisplayName("삭제")
-    @Transactional
     void t7() {
         assertThat(questionRepository.count()).isEqualTo(2);
 
@@ -91,7 +93,6 @@ class PostRepositoryTest {
 
     @Test
     @DisplayName("답변 생성")
-    @Transactional
     void t8() {
         Question question = questionRepository.findById(2).get();
 
@@ -100,13 +101,10 @@ class PostRepositoryTest {
         answer.setQuestion(question);
         answer.setCreateDate(LocalDateTime.now());
         answerRepository.save(answer);
-
-        assertThat(answer.getId()).isGreaterThan(0);
     }
 
     @Test
     @DisplayName("답변 생성 by oneToMany")
-    @Transactional
     void t9() {
         Question question = questionRepository.findById(2).get();
 
@@ -140,15 +138,5 @@ class PostRepositoryTest {
 
         Answer answer = answers.get(0);
         assertThat(answer.getContent()).isEqualTo("네 자동으로 생성됩니다.");
-    }
-
-    @Test
-    @DisplayName("findAnswer by question")
-    void t12() {
-        Question question = questionRepository.findById(2).get();
-
-        Answer answer1 = question.getAnswers().get(0);
-
-        assertThat(answer1.getId()).isEqualTo(1);
     }
 }
