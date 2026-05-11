@@ -14,7 +14,7 @@ public class QuestionController {
 
     @GetMapping("/question/list")
     public String list(Model model) {
-        List<Question> questionList = this.questionRepository.findAll();
+        List<Question> questionList = questionRepository.findAll();
         model.addAttribute("questionList", questionList);
 
         return "question_list";
